@@ -1,5 +1,5 @@
-# Better Loading Screen
-This is Better Loading Screen mod, this imitates the old Forge 1.12.2 style loading screen, and is fully customisable! This supports Fabric & Forge.
+# Better Loading Screen - Reborn (Unofficial)
+This is Better Loading Screen mod, this imitates the old Forge 1.12.2 style loading screen, and is fully customisable! This supports Fabric & Forge & Quilt.
 
 ## License
 View the `LICENSE` file for the license.
