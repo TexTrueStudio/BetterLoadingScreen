@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "me.shedaniel.betterloadingscreen.mixin.quilt",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "MixinMinecraft",
+    "MixinModelBakeryQuilt",
+    "MixinWindow"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
