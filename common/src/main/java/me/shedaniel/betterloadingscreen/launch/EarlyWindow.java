@@ -1,15 +1,16 @@
 package me.shedaniel.betterloadingscreen.launch;
-/*
+
 import ca.weblite.objc.NSObject;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.sun.jna.Pointer;
-import me.shedaniel.betterloadingscreen.BetterLoadingScreen;
-import me.shedaniel.betterloadingscreen.BetterLoadingScreenClient;
-import me.shedaniel.betterloadingscreen.BetterLoadingScreenConfig;
-import me.shedaniel.betterloadingscreen.EarlyGraphics;
-import me.shedaniel.betterloadingscreen.api.render.EarlyWindowHook;
+import me.shedaniel.betterloadingscreen.*;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyBufferBuilder;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyDrawType;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderFormat;
+import me.shedaniel.betterloadingscreen.launch.render.EarlyRenderingStates;
+import me.shedaniel.betterloadingscreen.launch.render.math.Matrix4f;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +19,12 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWNativeCocoa;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -40,13 +41,15 @@ public class EarlyWindow {
     public static int height;
     public static int framebufferWidth, framebufferHeight;
     private static int x, y;
-    public static int scale;
+    public static double scale;
+    public static int defaultGuiScale;
     public static boolean fullscreen;
     public static boolean running = true;
+    public static boolean hasRendered = false;
     public static Lock lock = new ReentrantLock();
     public static boolean hasRender = true;
     public static Thread thread;
-    public static Timer timer = new Timer(20.0F, 0L);
+    public static EarlyTimer timer = new EarlyTimer(20.0F, 0L);
     private static final Queue<Runnable> tasks = new ConcurrentLinkedDeque<>();
     public static Executor executor = tasks::add;
     
@@ -100,7 +103,25 @@ public class EarlyWindow {
         return null;
     }
     
-    public static void start(String[] args, @Nullable Boolean defaultFullscreen, @Nullable String mcVersion, BackgroundRenderer renderer) {
+    public static Double getDefaultGuiScale(Path gameDir) {
+        Path path = gameDir.resolve("options.txt");
+        
+        if (Files.exists(path)) {
+            try {
+                for (String line : Files.readAllLines(path)) {
+                    if (line.trim().startsWith("guiScale:")) {
+                        return Double.parseDouble(line.substring(line.indexOf(':') + 1).trim());
+                    }
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return null;
+    }
+    
+    public static void start(String[] args, Path gameDir, @Nullable String mcVersion, BackgroundRenderer renderer, boolean join) {
         List<String> list = Lists.newArrayList();
         GLFWErrorCallback errorCallback = GLFW.glfwSetErrorCallback((i, l) -> {
             list.add(String.format("GLFW error during init: [0x%X]%s", i, l));
@@ -117,15 +138,18 @@ public class EarlyWindow {
             }
         }
         
+        Boolean defaultFullscreen = getDefaultFullscreen(gameDir);
+        defaultGuiScale = Objects.requireNonNullElse(getDefaultGuiScale(gameDir), 0.0D).intValue();
+        
         GLFWErrorCallback.createPrint(System.err).set();
         
         long monitor = GLFW.glfwGetPrimaryMonitor();
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_CREATION_API, GLFW.GLFW_NATIVE_CONTEXT_API);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 2);
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_ANY_PROFILE);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         initDimensions(defaultFullscreen, args);
         if (fullscreen) {
@@ -148,18 +172,18 @@ public class EarlyWindow {
                 int[] monitorXA = new int[1];
                 int[] monitorYA = new int[1];
                 GLFW.glfwGetMonitorPos(monitor, monitorXA, monitorYA);
-                GLFWVidMode videomode = GLFW.glfwGetVideoMode(monitor);
+                GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
                 int monitorX = monitorXA[0];
                 int monitorY = monitorYA[0];
-                x = monitorX + videomode.width() / 2 - width / 2;
-                y = monitorY + videomode.height() / 2 - height / 2;
+                x = monitorX + vidMode.width() / 2 - width / 2;
+                y = monitorY + vidMode.height() / 2 - height / 2;
             }
         }
         
         GLFW.glfwMakeContextCurrent(window);
         setMode(monitor);
         refreshFramebufferSize();
-        scale = calculateScale(false);
+        scale = calculateScale(defaultGuiScale, false);
         GLFW.glfwSwapInterval(0);
         
         GLFW.glfwSetFramebufferSizeCallback(window, EarlyWindow::framebufferResize);
@@ -175,6 +199,7 @@ public class EarlyWindow {
             GLFW.glfwMakeContextCurrent(window);
             GL.createCapabilities();
             GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            
             while (running) {
                 try {
                     Runnable task;
@@ -182,20 +207,9 @@ public class EarlyWindow {
                         task.run();
                     }
                     if (hasRender) {
-                        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-                        GL11.glViewport(0, 0, width, height);
-                        GL11.glMatrixMode(GL11.GL_PROJECTION);
-                        GL11.glLoadIdentity();
-                        GL11.glOrtho(0.0F, (float) width / scale, 0.0F, (float) height / scale, 1000.0F, 3000.0F);
-                        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-                        GL11.glLoadIdentity();
-                        GL11.glPushMatrix();
-                        GL11.glTranslated(0, 0, -2000F);
-                        render(renderer);
-                        GL11.glPopMatrix();
-                        GLFW.glfwSwapBuffers(window);
-                        GLFW.glfwPollEvents();
+                        renderWindow(renderer);
                     }
+                    hasRendered = true;
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -208,39 +222,57 @@ public class EarlyWindow {
         }, "Early Visualization");
         thread.setDaemon(true);
         thread.start();
+        if (join) {
+            join();
+        }
+    }
+    
+    public static void join() {
+        if (hasRendered) return;
+        CompletableFuture.runAsync(() -> {
+            while (!hasRendered) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }).join();
+    }
+    
+    private static void renderWindow(BackgroundRenderer renderer) {
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glViewport(0, 0, width, height);
+        EarlyRenderingStates.projectionMatrix.setIdentity();
+        EarlyRenderingStates.projectionMatrix = Matrix4f.orthographic(0.0F, (float) (width / scale), 0.0F, (float) (height / scale), 1000.0F, 3000.0F);
+        EarlyRenderingStates.modelViewMatrix.setIdentity();
+        EarlyRenderingStates.modelViewMatrix.translate(0.0f, 0.0f, -2000.0f);
+        
+        if (BetterLoadingScreen.CONFIG.rainbow) {
+            EarlyBufferBuilder builder = new EarlyBufferBuilder("position_color", EarlyRenderFormat.POSITION_COLOR);
+            builder.pos(0, (float) (height / scale), 0.0f).color(1.0f, 0.0f, 0.0f, 1.0f).endVertex();
+            builder.pos((float) (width / scale), (float) (height / scale), 0.0f).color(171 / 255f, 74 / 255f, 14 / 255f, 1.0f).endVertex();
+            builder.pos((float) (width / scale), 0, 0.0f).color(0.0f, 0.0f, 1.0f, 1.0f).endVertex();
+            builder.pos(0, 0, 0.0f).color(156 / 255f, 35 / 255f, 217 / 255f, 1.0f).endVertex();
+            builder.end(EarlyDrawType.QUAD);
+        }
+        
+        render(renderer);
+        
+        GLFW.glfwSwapBuffers(window);
+        GLFW.glfwPollEvents();
     }
     
     private static void render(BackgroundRenderer renderer) {
         EarlyGraphics graphics = EarlyGraphics.INSTANCE;
         timer.advanceTime(System.currentTimeMillis());
         renderer.render(graphics);
+        EarlyRenderingStates.modelViewMatrix.translate(0, 0, 10);
         if (BetterLoadingScreen.CONFIG.rendersLogo) {
             renderer.renderLogo(BetterLoadingScreenConfig.getColor(BetterLoadingScreen.CONFIG.logoColor, 0xFFFFFF) | 0xFF000000);
         }
         BetterLoadingScreenClient.renderOverlay(graphics, 0, 0, timer.tickDelta, 1.0F);
         for (EarlyWindowHook hook : BetterLoadingScreenClient.hooks) {
             hook.render(graphics, timer.tickDelta);
-        }
-    }
-    
-    public static class Timer {
-        public float partialTick;
-        public float tickDelta;
-        private long lastMs;
-        private final float msPerTick;
-        
-        public Timer(float f, long l) {
-            this.msPerTick = 1000.0F / f;
-            this.lastMs = l;
-        }
-        
-        public int advanceTime(long l) {
-            this.tickDelta = (float) (l - this.lastMs) / this.msPerTick;
-            this.lastMs = l;
-            this.partialTick += this.tickDelta;
-            int i = (int) this.partialTick;
-            this.partialTick -= (float) i;
-            return i;
         }
     }
     
@@ -279,9 +311,9 @@ public class EarlyWindow {
         framebufferHeight = ah[0] > 0 ? ah[0] : 1;
     }
     
-    public static int calculateScale(boolean bl) {
+    public static int calculateScale(int scale, boolean bl) {
         int j;
-        for (j = 1; j < framebufferWidth && j < framebufferHeight && framebufferWidth / (j + 1) >= 320 && framebufferHeight / (j + 1) >= 240; ++j) {
+        for (j = 1; j != scale && j < framebufferWidth && j < framebufferHeight && framebufferWidth / (j + 1) >= 320 && framebufferHeight / (j + 1) >= 240; ++j) {
         }
         
         if (bl && j % 2 != 0) {
@@ -311,7 +343,7 @@ public class EarlyWindow {
     public static void updateFBSize(IntConsumer width, IntConsumer height) {
     }
     
-    public static void setRender(boolean render, boolean wait) {
+    public static void setRender(@Nullable Double scale, boolean render, boolean wait) {
         EarlyWindow.tasks.clear();
         CompletableFuture<Void> async = CompletableFuture.runAsync(() -> {
             GLFW.glfwMakeContextCurrent(render ? EarlyWindow.window : 0L);
@@ -322,7 +354,9 @@ public class EarlyWindow {
             if (render) {
                 GL.createCapabilities();
                 refreshFramebufferSize();
-                scale = calculateScale(false);
+                if (scale != null && scale != 0) {
+                    EarlyWindow.scale = scale;
+                }
             }
             EarlyWindow.hasRender = render;
         }, EarlyWindow.executor);
@@ -334,7 +368,13 @@ public class EarlyWindow {
     public static void framebufferResize(long win, int w, int h) {
         framebufferWidth = w;
         framebufferHeight = h;
-        scale = calculateScale(false);
+        scale = calculateScale(defaultGuiScale, false);
+    }
+    
+    public static void framebufferResizeWithScale(double scale, int w, int h) {
+        framebufferWidth = w;
+        framebufferHeight = h;
+        EarlyWindow.scale = scale;
     }
     
     public static void windowMove(long win, int xpos, int ypos) {
@@ -347,5 +387,3 @@ public class EarlyWindow {
         height = h;
     }
 }
-
- */

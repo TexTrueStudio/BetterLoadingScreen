@@ -1,13 +1,18 @@
 package me.shedaniel.betterloadingscreen.impl.mixinstub;
 
-import me.shedaniel.betterloadingscreen.api.step.SteppedTask;
+
+import dev.quantumfusion.taski.builtin.StepTask;
 
 public interface ModelBakeryStub {
-    void betterloadingscreen$setBlockTask(SteppedTask task);
+    void betterloadingscreen$setBlockTask(StepTask task);
     
-    SteppedTask betterloadingscreen$getBlockTask();
+    StepTask betterloadingscreen$getBlockTask();
     
-    void betterloadingscreen$setItemTask(SteppedTask task);
+    void betterloadingscreen$setItemTask(StepTask task);
     
-    SteppedTask betterloadingscreen$getItemTask();
+    StepTask betterloadingscreen$getItemTask();
+    
+    void betterloadingscreen$setTextureTask(StepTask task);
+    
+    StepTask betterloadingscreen$getTexturesTask();
 }

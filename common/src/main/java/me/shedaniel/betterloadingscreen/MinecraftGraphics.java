@@ -7,7 +7,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import me.shedaniel.betterloadingscreen.api.render.AbstractGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.FontSet;
@@ -27,7 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
 
-public enum MinecraftGraphics implements AbstractGraphics {
+public enum MinecraftGraphics implements GraphicsBackend {
     INSTANCE;
     
     public static final Logger LOGGER = LogManager.getLogger(MinecraftGraphics.class);
@@ -86,10 +85,10 @@ public enum MinecraftGraphics implements AbstractGraphics {
             y2 = tmp;
         }
         
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
+        float r = ColorUtil.rF(color);
+        float g = ColorUtil.gF(color);
+        float b = ColorUtil.bF(color);
+        float a = ColorUtil.aF(color);
         BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
@@ -102,7 +101,7 @@ public enum MinecraftGraphics implements AbstractGraphics {
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.end();
-        //BufferUploader.end(bufferBuilder);
+        BufferUploader.end(bufferBuilder);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
@@ -136,11 +135,6 @@ public enum MinecraftGraphics implements AbstractGraphics {
     }
     
     @Override
-    public void drawStringWithShadow(String string, int x, int y, int color) {
-        getFont().drawShadow(stack, string, x, y, color);
-    }
-    
-    @Override
     public int width(String string) {
         return getFont().width(string);
     }
@@ -157,10 +151,10 @@ public enum MinecraftGraphics implements AbstractGraphics {
     
     @Override
     public void innerBlit(int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, int color) {
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
+        float r = ColorUtil.rF(color);
+        float g = ColorUtil.gF(color);
+        float b = ColorUtil.bF(color);
+        float a = ColorUtil.aF(color);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.enableBlend();
         RenderSystem.enableTexture();
@@ -173,6 +167,6 @@ public enum MinecraftGraphics implements AbstractGraphics {
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z).uv(u2, v1).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z).uv(u1, v1).color(r, g, b, a).endVertex();
         bufferBuilder.end();
-        //BufferUploader.end(bufferBuilder);
+        BufferUploader.end(bufferBuilder);
     }
 }
