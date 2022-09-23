@@ -22,6 +22,6 @@
     "better_loading_screen-common.mixins.json"
   ],
   "depends": {
-    "minecraft": ">=1.18.1"
+    "minecraft": "1.19.x"
   }
 }
