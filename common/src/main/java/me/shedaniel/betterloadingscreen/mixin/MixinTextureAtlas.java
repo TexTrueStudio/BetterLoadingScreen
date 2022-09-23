@@ -63,7 +63,7 @@ public class MixinTextureAtlas {
         prepareToStitch(set);
     }
     
-    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "m_174717_", "lambda$makeSprites$2"}, at = @At(
+    @Inject(method = {"method_18160"}, at = @At(
             value = "HEAD"
     ))
     private void extractTextureStart(ResourceLocation resourceLocation, ResourceManager resourceManager, Queue queue, CallbackInfo ci) {
@@ -72,7 +72,7 @@ public class MixinTextureAtlas {
         }
     }
     
-    @Inject(method = {"method_18160", "lambda$getBasicSpriteInfos$2", "m_174717_", "lambda$makeSprites$2"}, at = @At(
+    @Inject(method = {"method_18160"}, at = @At(
             value = "RETURN"
     ))
     private void extractTextureEnd(ResourceLocation resourceLocation, ResourceManager resourceManager, Queue queue, CallbackInfo ci) {

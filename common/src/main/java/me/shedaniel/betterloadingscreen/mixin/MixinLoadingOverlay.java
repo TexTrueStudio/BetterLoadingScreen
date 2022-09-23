@@ -62,7 +62,7 @@ public abstract class MixinLoadingOverlay {
         return y - 20;
     }
     
-    @Inject(method = {"method_35733", "lambda$static$0", "m_169327_"}, at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = {"method_35733"}, at = @At(value = "HEAD"), cancellable = true)
     private static void getBrandColor(CallbackInfoReturnable<Integer> cir) {
         int bgColor = BetterLoadingScreenClient.renderer.getBackgroundColor() | 0xFF000000;
         cir.setReturnValue(bgColor);

@@ -102,7 +102,7 @@ public enum MinecraftGraphics implements AbstractGraphics {
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, 0.0F).color(r, g, b, a).endVertex();
         bufferBuilder.end();
-        BufferUploader.end(bufferBuilder);
+        //BufferUploader.end(bufferBuilder);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
@@ -173,6 +173,6 @@ public enum MinecraftGraphics implements AbstractGraphics {
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z).uv(u2, v1).color(r, g, b, a).endVertex();
         bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z).uv(u1, v1).color(r, g, b, a).endVertex();
         bufferBuilder.end();
-        BufferUploader.end(bufferBuilder);
+        //BufferUploader.end(bufferBuilder);
     }
 }

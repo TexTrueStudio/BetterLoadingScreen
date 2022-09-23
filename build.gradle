@@ -33,6 +33,14 @@ allprojects {
     group = rootProject.maven_group
 
     repositories {
+
+        maven {
+            url 'https://quantumfusion.dev/maven'
+        }
+    }
+
+    dependencies {
+        implementation "dev.quantumfusion:Taski:1.1.0"
     }
 
     tasks.withType(JavaCompile) {
