@@ -65,7 +65,7 @@ public class MixinModelBakery implements ModelBakeryStub {
     }
     
     // Blocks
-    @Inject(method = {"method_4723", "lambda$processLoading$7"}, at = @At("RETURN"))
+    @Inject(method = {"method_4723"}, at = @At("RETURN"))
     private void builtinBlockLoaded(ResourceLocation resourceLocation, StateDefinition stateDefinition, CallbackInfo ci) {
         this.blockTask.next();
     }

@@ -42,13 +42,13 @@ public class BetterLoadingScreenQuiltPreInitClient {
             }
             throw new RuntimeException("Resource not found: " + url);
         };
-        BetterLoadingScreenClient.inDev = FabricLoader.getInstance().isDevelopmentEnvironment();
+        BetterLoadingScreenClient.inDev = QuiltLoader.isDevelopmentEnvironment();
         
         BackgroundRenderer renderer = BackgroundRenderer.DEFAULT;
         
         if (BetterLoadingScreen.CONFIG.detectKubeJS && QuiltLoader.isModLoaded("kubejs")) {
             LOGGER.info("[BetterLoadingScreen] Detected KubeJS, inheriting KubeJS options!");
-            renderer = Objects.requireNonNullElse(BackgroundRenderer.useKubeJs(FabricLoader.getInstance().getGameDir()), renderer);
+            renderer = Objects.requireNonNullElse(BackgroundRenderer.useKubeJs(QuiltLoader.getGameDir()), renderer);
         }
         
         if (Files.exists(BetterLoadingScreen.BACKGROUND_PATH)) {
@@ -59,8 +59,8 @@ public class BetterLoadingScreenQuiltPreInitClient {
         BetterLoadingScreenClient.renderer = renderer;
         
         if (BetterLoadingScreen.isEarlyLoadingEnabled()) {
-            EarlyWindow.start(QuiltLoader.getLaunchArguments(true), QuiltLoader.getGameDir(), FabricLoader.getInstance().getModContainer("minecraft").get()
-                    .getMetadata().getVersion().getFriendlyString(), renderer, true);
+            EarlyWindow.start(QuiltLoader.getLaunchArguments(true), QuiltLoader.getGameDir(), String.valueOf(QuiltLoader.getModContainer("minecraft").get()
+                    .metadata().version()), renderer, true);
         }
     }
 }
