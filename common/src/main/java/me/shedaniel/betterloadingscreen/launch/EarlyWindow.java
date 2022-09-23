@@ -1,5 +1,5 @@
 package me.shedaniel.betterloadingscreen.launch;
-
+/*
 import ca.weblite.objc.NSObject;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -347,3 +347,5 @@ public class EarlyWindow {
         height = h;
     }
 }
+
+ */
