@@ -20,17 +20,17 @@ jobs:
       - name: Upload build artifacts (Fabric)
         uses: actions/upload-artifact@v1
         with:
-          name: AutoBuild-Fabric
+          name: Artifacts-Fabric
           path: fabric/build/libs
 
       - name: Upload build artifacts (Forge)
         uses: actions/upload-artifact@v1
         with:
-          name: AutoBuild-Forge
+          name: Artifacts-Forge
           path: forge/build/libs
 
       - name: Upload build artifacts (Quilt)
         uses: actions/upload-artifact@v1
         with:
-          name: AutoBuild-Quilt
+          name: Artifacts-Quilt
           path: quilt/build/libs

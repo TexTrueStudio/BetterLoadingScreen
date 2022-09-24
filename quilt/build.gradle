@@ -33,7 +33,7 @@ dependencies {
 
 processResources {
     inputs.property "group", rootProject.maven_group
-    inputs.property "version", project.version
+    inputs.property "version", "${project.version}-${loom_platform}"
 
     filesMatching("quilt.mod.json") {
         expand "group": rootProject.maven_group,
