@@ -1,12 +1,12 @@
 modLoader = "javafml"
 loaderVersion = "[39,)"
-license = "Apache 2.0+ARR"
+license = "Apache 2.0 + Mojang Studios' ARR"
 
 [[mods]]
 modId = "better_loading_screen"
 version = "${version}"
-displayName = "Better Loading Screen"
-authors = "shedaniel"
+displayName = "Better Loading Screen - Reborn (Unofficial)"
+authors = "shedaniel, TexTrue, TexTrueStudio"
 description = '''
 A mod to improve the loading screen.
 '''
@@ -22,6 +22,6 @@ side = "BOTH"
 [[dependencies.better_loading_screen]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.18.1,)"
+versionRange = "[1.18,)"
 ordering = "NONE"
 side = "BOTH"

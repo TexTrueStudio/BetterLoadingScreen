@@ -8,9 +8,9 @@
     "group": "${group}",
     "id": "better_loading_screen",
     "version": "${version}",
-    "name": "Better Loading Screen",
+    "name": "Better Loading Screen - Reborn (Unofficial)",
     "description": "A mod to improve the loading screen.",
-    "authors": ["shedaniel"],
+    "authors": ["shedaniel","TexTrue","TexTrueStudio"],
     "icon": "icon.png",
     "intermediate_mappings": "net.fabricmc:intermediary",
     "environment": "*",
@@ -38,7 +38,7 @@
       },
       {
         "id": "minecraft",
-        "version": ">=1.18.2"
+        "version": "1.18.x"
       }
     ]
   }
