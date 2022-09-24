@@ -16,8 +16,21 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew.bat build
-      - name: Upload build artifacts
+
+      - name: Upload build artifacts (Fabric)
         uses: actions/upload-artifact@v1
         with:
-          name: AutoBuild
-          path: build/libs
+          name: AutoBuild-Fabric
+          path: fabric/build/libs
+
+      - name: Upload build artifacts (Forge)
+        uses: actions/upload-artifact@v1
+        with:
+          name: AutoBuild-Forge
+          path: forge/build/libs
+
+      - name: Upload build artifacts (Quilt)
+        uses: actions/upload-artifact@v1
+        with:
+          name: AutoBuild-Quilt
+          path: quilt/build/libs

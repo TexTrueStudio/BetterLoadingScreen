@@ -3,13 +3,13 @@ package me.shedaniel.betterloadingscreen.mixin.quilt;
 import dev.quantumfusion.taski.builtin.StageTask;
 import dev.quantumfusion.taski.builtin.StepTask;
 import me.shedaniel.betterloadingscreen.Tasks;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.Minecraft;
-import org.quiltmc.loader.api.QuiltLoader;
-import org.quiltmc.loader.api.entrypoint.EntrypointContainer;
 import org.quiltmc.loader.impl.QuiltLoaderImpl;
 import org.quiltmc.loader.impl.util.ExceptionUtil;
-import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
-import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,14 +24,14 @@ public abstract class MixinMinecraft {
     @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "InvalidInjectorMethodSignature"})
     @Redirect(at = @At(
             value = "INVOKE",
-            target = "Lnet/quiltmc/loader/impl/game/minecraft/Hooks;startClient(Ljava/io/File;Ljava/lang/Object;)V"
+            target = "Lnet/fabricmc/loader/impl/game/minecraft/Hooks;startClient(Ljava/io/File;Ljava/lang/Object;)V"
     ), method = "<init>")
     private void init(File runDir, Object gameInstance) {
         if (runDir == null) {
             runDir = new File(".");
         }
-        List<EntrypointContainer<ModInitializer>> commonContainers = QuiltLoader.getEntrypointContainers("main", ModInitializer.class);
-        List<EntrypointContainer<ClientModInitializer>> clientContainers = QuiltLoader.getEntrypointContainers("client", ClientModInitializer.class);
+        List<EntrypointContainer<ModInitializer>> commonContainers = FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class);
+        List<EntrypointContainer<ClientModInitializer>> clientContainers = FabricLoader.getInstance().getEntrypointContainers("client", ClientModInitializer.class);
         
         QuiltLoaderImpl.INSTANCE.prepareModInit(runDir.toPath(), gameInstance);
         StepTask common = new StepTask("Common", commonContainers.size());
@@ -53,7 +53,7 @@ public abstract class MixinMinecraft {
                 exception = ExceptionUtil.gatherExceptions(t,
                         exception,
                         exc -> new RuntimeException(String.format("Could not execute entrypoint stage '%s' due to errors, provided by '%s'!",
-                                name, container.getProvider().metadata().id()),
+                                name, container.getProvider().getMetadata().getId()),
                                 exc));
             }
             
