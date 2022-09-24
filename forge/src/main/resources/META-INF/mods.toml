@@ -5,7 +5,7 @@ license = "Apache 2.0 + Mojang Studios' ARR"
 [[mods]]
 modId = "better_loading_screen"
 version = "${version}"
-displayName = "Better Loading Screen - Reborn (Unofficial)"
+displayName = "Better Loading Screen - Reloading (Unofficial)"
 authors = "shedaniel, TexTrue, TexTrueStudio"
 description = '''
 A mod to improve the loading screen.

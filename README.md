@@ -1,4 +1,4 @@
-# Better Loading Screen - Reborn (Unofficial)
+# Better Loading Screen - Reloading (Unofficial)
 This is Better Loading Screen mod, this imitates the old Forge 1.12.2 style loading screen, and is fully customisable! This supports Fabric & Forge.
 
 ## License
