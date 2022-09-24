@@ -6,6 +6,8 @@ import net.minecraft.util.StringUtil;
 public class BetterLoadingScreenConfig {
     @Comment("\nWhether the memory usage bar should be drawn.\nDefault: true")
     public boolean rendersMemoryBar = true;
+    @Comment("\nWhether the game loading time on the top left be drawn.\nDefault: true")
+    public boolean rendersLoadingTime = true;
     @Comment("\nWhether the current hints on the top left should be drawn.\nDefault: true")
     public boolean rendersHint = true;
     @Comment("\nRenders the logo on the loading screen.\nDefault: true")

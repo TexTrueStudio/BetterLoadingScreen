@@ -1,6 +1,5 @@
 package me.shedaniel.betterloadingscreen;
 
-
 import dev.quantumfusion.taski.Task;
 import dev.quantumfusion.taski.builtin.StageTask;
 import dev.quantumfusion.taski.builtin.StepTask;
@@ -16,6 +15,7 @@ public class BetterLoadingScreenClient {
     public static boolean inDev;
     public static BackgroundRenderer renderer;
     public static List<EarlyWindowHook> hooks = new ArrayList<>();
+    public static long bootstrapTime = 0;
     
     public static void renderOverlay(GraphicsBackend graphics, int mouseX, int mouseY, float delta, float alpha) {
         int scaledWidth = graphics.getScaledWidth();
@@ -29,9 +29,9 @@ public class BetterLoadingScreenClient {
             Runtime runtime = Runtime.getRuntime();
             long usedMemory = runtime.totalMemory() - runtime.freeMemory();
             if (alpha > 0.02F) {
-                graphics.drawString("Memory Usage: " + usedMemory / 1024 / 1024 + "MB / " + runtime.maxMemory() / 1024 / 1024 + "MB", scaledWidth / 2 - progressBarWidth / 2, 15, textColor);
+                graphics.drawString("Memory Usage: " + usedMemory / 1024 / 1024 + "MB / " + runtime.maxMemory() / 1024 / 1024 + "MB", scaledWidth / 2 - progressBarWidth / 2, 25, textColor);
             }
-            renderProgressBar(graphics, scaledWidth / 2, progressBarWidth, 25, usedMemory / (double) runtime.maxMemory(), alpha, renderer);
+            renderProgressBar(graphics, scaledWidth / 2, progressBarWidth, 35, usedMemory / (double) runtime.maxMemory(), alpha, renderer);
         }
         
         hint = null;
@@ -45,6 +45,12 @@ public class BetterLoadingScreenClient {
         
         if (alpha > 0.02F && inDev) {
             graphics.drawString(graphics.getClass().getSimpleName(), 2, graphics.getScaledHeight() - 9, textColor);
+        }
+
+        // Render game load used time
+        if (bootstrapTime != 0 && alpha > 0.2F && BetterLoadingScreen.CONFIG.rendersLoadingTime) {
+            int loadingSec = Math.round((System.currentTimeMillis() - bootstrapTime) / 1000f);
+            graphics.drawString("Loading Time: " + secToTimeString(loadingSec), 2, 12, textColor);
         }
     }
     
@@ -107,5 +113,10 @@ public class BetterLoadingScreenClient {
         if (progressWidth > 0) {
             graphics.fill(x + 2, y + 2, x + progressWidth, y + 10 - 2, barColor);
         }
+    }
+
+    private static String secToTimeString(int sce) {
+        int min = sce / 60;
+        return (min + "m " + (sce - 60 * min) + "s");
     }
 }

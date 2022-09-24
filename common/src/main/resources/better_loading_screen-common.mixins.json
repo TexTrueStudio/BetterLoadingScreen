@@ -13,6 +13,7 @@
     "MixinWindow"
   ],
   "mixins": [
+    "BootstrapMixin",
     "MixinBuiltinRegistries"
   ],
   "injectors": {
