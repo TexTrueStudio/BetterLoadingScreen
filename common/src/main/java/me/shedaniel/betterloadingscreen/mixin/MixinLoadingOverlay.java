@@ -63,7 +63,7 @@ public abstract class MixinLoadingOverlay {
             builder.vertex(graphics.getScaledWidth(), 0, 0.0f).color(0.0f, 0.0f, 1.0f, a).endVertex();
             builder.vertex(0, 0, 0.0f).color(156 / 255f, 35 / 255f, 217 / 255f, a).endVertex();
             builder.end();
-            BufferUploader.end(builder);
+            //BufferUploader.end(builder);
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
         }
@@ -92,7 +92,7 @@ public abstract class MixinLoadingOverlay {
         return y - 20;
     }
     
-    @Inject(method = {"method_35733", "lambda$static$0", "m_169327_"}, at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = {"method_35733"}, at = @At(value = "HEAD"), cancellable = true)
     private static void getBrandColor(CallbackInfoReturnable<Integer> cir) {
         int bgColor = BetterLoadingScreenClient.renderer.getBackgroundColor() | 0xFF000000;
         cir.setReturnValue(bgColor);
