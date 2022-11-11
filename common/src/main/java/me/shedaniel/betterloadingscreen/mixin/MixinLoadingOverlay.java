@@ -63,7 +63,7 @@ public abstract class MixinLoadingOverlay {
             builder.vertex(graphics.getScaledWidth(), 0, 0.0f).color(0.0f, 0.0f, 1.0f, a).endVertex();
             builder.vertex(0, 0, 0.0f).color(156 / 255f, 35 / 255f, 217 / 255f, a).endVertex();
             builder.end();
-            //BufferUploader.end(builder);
+            BufferUploader.end(builder);
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
         }
