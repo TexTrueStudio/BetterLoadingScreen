@@ -7,8 +7,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.client.Minecraft;
-import org.quiltmc.loader.impl.QuiltLoaderImpl;
 import org.quiltmc.loader.impl.util.ExceptionUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,7 +33,7 @@ public abstract class MixinMinecraft {
         List<EntrypointContainer<ModInitializer>> commonContainers = FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class);
         List<EntrypointContainer<ClientModInitializer>> clientContainers = FabricLoader.getInstance().getEntrypointContainers("client", ClientModInitializer.class);
 
-        QuiltLoaderImpl.INSTANCE.prepareModInit(runDir.toPath(), gameInstance);
+        FabricLoaderImpl.INSTANCE.prepareModInit(runDir.toPath().toFile(), gameInstance);
         StepTask common = new StepTask("Common", commonContainers.size());
         StepTask client = new StepTask("Client", clientContainers.size());
         Tasks.MAIN.setSubTask(new StageTask("Loading Mods", common, client));
