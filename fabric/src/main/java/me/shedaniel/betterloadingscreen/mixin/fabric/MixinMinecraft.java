@@ -10,10 +10,7 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.fabricmc.loader.impl.util.ExceptionUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelManager;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
