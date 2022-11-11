@@ -6,7 +6,7 @@ import me.shedaniel.betterloadingscreen.EarlyGraphics;
 import me.shedaniel.betterloadingscreen.Tasks;
 import me.shedaniel.betterloadingscreen.launch.EarlyWindow;
 import me.shedaniel.betterloadingscreen.launch.early.BackgroundRenderer;
-import net.fabricmc.loader.api.FabricLoader;
+//import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quiltmc.loader.api.QuiltLoader;
