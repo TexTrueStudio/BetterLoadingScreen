@@ -1,6 +1,7 @@
 package me.shedaniel.betterloadingscreen.quilt;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 //import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.loader.api.minecraft.MinecraftQuiltLoader;
@@ -11,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 public class BetterLoadingScreenQuiltPreInit implements PreLaunchEntrypoint {
     @Override
     public void onPreLaunch() {
-        if (MinecraftQuiltLoader.getEnvironmentType() == EnvType.CLIENT) {
+        if (FabricLoader.INSTANCE.getEnvironmentType() == EnvType.CLIENT) {
             try {
                 Class.forName("me.shedaniel.betterloadingscreen.quilt.BetterLoadingScreenQuiltPreInitClient")
                         .getDeclaredMethod("onPreLaunch")
